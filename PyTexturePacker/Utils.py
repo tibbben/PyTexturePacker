@@ -32,6 +32,35 @@ def load_images_from_paths(image_path_list):
 
     return image_rect_list
 
+# added for direct calls from tiling pipeline
+def load_images_from_dict(image_dict):
+    """
+    load all images from a passed dict
+    :param dict: dict with images
+    :return: ImageRect list
+    """
+
+    from .ImageRect import ImageRect
+
+    image_rect_list = []
+    for image in image_dict:
+        if image_dict[image] == None:
+            continue
+        image_rect = ImageRect()
+        image_rect.image= image_dict[image]['image']
+        image_rect.image_path = image
+
+        image_rect.x, image_rect.y = 0, 0
+        image_rect.width, image_rect.height = image_rect.image.size
+
+        image_rect.source_size = image_rect.image.size
+        image_rect.source_box = (0, 0, image_rect.width, image_rect.height)
+
+        image_rect._rotated = False
+        image_rect._trimmed = False
+        image_rect_list.append(image_rect)
+
+    return image_rect_list
 
 def load_images_from_dir(dir_path):
     """

@@ -169,6 +169,9 @@ class PackerInterface(object):
 
         if isinstance(input_images, (tuple, list)):
             image_rects = Utils.load_images_from_paths(input_images)
+        elif isinstance(input_images, (dict)):
+            # added for direct calls from tiling pipeline
+            image_rects = Utils.load_images_from_dict(input_images)
         else:
             image_rects = Utils.load_images_from_dir(input_images)
 
@@ -181,6 +184,7 @@ class PackerInterface(object):
                 image_rect.extrude(self.extrude)
 
         atlas_list = self._pack(image_rects)
+        plist_list = [] # added to return plists as function result
 
         assert "%d" in output_name or len(atlas_list) == 1, 'more than one output image, but no "%d" in output_name'
 
@@ -189,6 +193,7 @@ class PackerInterface(object):
 
             packed_plist = atlas.dump_plist("%s%s" % (texture_file_name, self.texture_format), input_base_path,
                                             self.atlas_format)
+            plist_list.append(packed_plist) # store plist in  a list
             packed_image = atlas.dump_image(self.bg_color)
 
             if self.reduce_border_artifacts:
@@ -198,6 +203,10 @@ class PackerInterface(object):
             Utils.save_atlas_data(packed_plist, os.path.join(output_path, "%s%s" % (texture_file_name, atlas_data_ext)),
                 self.atlas_format)
             Utils.save_image(packed_image, os.path.join(output_path, "%s%s" % (texture_file_name, self.texture_format)))
+
+        # added to return plists as function result
+        if isinstance(input_images, (dict)):
+            return plist_list
 
     def multi_pack(self, pack_args_list):
         """

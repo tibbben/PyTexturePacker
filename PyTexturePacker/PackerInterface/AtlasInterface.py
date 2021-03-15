@@ -54,10 +54,14 @@ class AtlasInterface(object):
                                  - (image_rect.source_box[1] + height / 2. - image_rect.source_size[1] / 2.))
 
             path = image_rect.image_path
-            if input_base_path is None:
-                _, path = os.path.split(path)
+            if isinstance(path,(int)):
+                # added for images from dict from tiling pipeline
+                path = str(path)
             else:
-                path = os.path.relpath(os.path.abspath(path), os.path.abspath(input_base_path))
+                if input_base_path is None:
+                    _, path = os.path.split(path)
+                else:
+                    path = os.path.relpath(os.path.abspath(path), os.path.abspath(input_base_path))
 
             if atlas_format == ATLAS_FORMAT_PLIST:
                 frames[path] = dict(
